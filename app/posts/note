@@ -1,0 +1,388 @@
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TextInput, Button, Image, ScrollView, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
+import Colors from '../constants/Colors'; // Update the path according to your project structure
+
+export default function FindFlatmates() {
+  const [formData, setFormData] = useState({
+    name: '',
+    detailed: '',
+    locality: '',
+    share: '',
+    map: '',
+    available: '',
+    contact: '',
+    whatsapp: '',
+    furnished: false,
+    parkingCar: false,
+    parkingBike: false,
+    pets: false,
+    amenities: '',
+    included: '',
+    notIncluded: '',
+  });
+
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+  const handleInputChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+    if (value) {
+      setErrors({ ...errors, [name]: '' });
+    }
+  };
+
+  const handleSwitchChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const onImagePick = () => {
+    // Implement image picker logic here
+  };
+
+  const removeImage = (image) => {
+    setImages(images.filter(img => img !== image));
+  };
+
+  const validateStep1 = () => {
+    const requiredFields = ['name', 'locality', 'share', 'map', 'available'];
+    const newErrors = {};
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        newErrors[field] = `${field} is required`;
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const requiredFields = ['amenities', 'included', 'notIncluded'];
+    const newErrors = {};
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        newErrors[field] = `${field} is required`;
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = () => {
+    if (images.length === 0) {
+      setErrors({ ...errors, images: 'At least one image is required' });
+      return false;
+    }
+    setErrors({ ...errors, images: '' });
+    return true;
+  };
+
+  const handleSubmit = () => {
+    // Implement submit logic here
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      {loading ? (
+        <ActivityIndicator style={styles.activityIndicator} size="large" color={Colors.PRIMARY} />
+      ) : (
+        <ProgressSteps
+          borderWidth={4}
+          activeStepIconBorderColor="#4bb543"
+          progressBarColor="#ebebe4"
+          completedProgressBarColor="#4bb543"
+          activeStepIconColor="transparent"
+          completedStepIconColor="#4bb543"
+          disabledStepIconColor="#ebebe4"
+          activeLabelColor="#4bb543"
+          completedCheckColor="white"
+        >
+          <ProgressStep
+            label="Step 1"
+            nextBtnText="Next"
+            previousBtnText="Back"
+            onNext={validateStep1}
+            errors={!!Object.keys(errors).length}
+          >
+            <View style={styles.stepContent}>
+              <Text style={styles.label}>Property Name *</Text>
+              <TextInput
+                style={[styles.input, errors.name && styles.errorInput]}
+                placeholder="Property Name"
+                value={formData.name}
+                onChangeText={(text) => handleInputChange('name', text)}
+              />
+              {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
+              <Text style={styles.label}>Detailed Description</Text>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Detailed Description"
+                value={formData.detailed}
+                onChangeText={(text) => handleInputChange('detailed', text)}
+                multiline
+              />
+
+              <Text style={styles.label}>Locality *</Text>
+              <TextInput
+                style={[styles.input, errors.locality && styles.errorInput]}
+                placeholder="Locality"
+                value={formData.locality}
+                onChangeText={(text) => handleInputChange('locality', text)}
+              />
+              {errors.locality && <Text style={styles.errorText}>{errors.locality}</Text>}
+
+              <Text style={styles.label}>Share (Rent) *</Text>
+              <TextInput
+                style={[styles.input, errors.share && styles.errorInput]}
+                placeholder="Share Amount"
+                value={formData.share}
+                onChangeText={(text) => handleInputChange('share', text)}
+                keyboardType="numeric"
+              />
+              {errors.share && <Text style={styles.errorText}>{errors.share}</Text>}
+
+              <Text style={styles.label}>Map URL *</Text>
+              <TextInput
+                style={[styles.input, errors.map && styles.errorInput]}
+                placeholder="Map URL"
+                value={formData.map}
+                onChangeText={(text) => handleInputChange('map', text)}
+              />
+              {errors.map && <Text style={styles.errorText}>{errors.map}</Text>}
+
+              <Text style={styles.label}>Available Date *</Text>
+              <TextInput
+                style={[styles.input, errors.available && styles.errorInput]}
+                placeholder="Available Date"
+                value={formData.available}
+                onChangeText={(text) => handleInputChange('available', text)}
+              />
+              {errors.available && <Text style={styles.errorText}>{errors.available}</Text>}
+
+              <Text style={styles.label}>Contact</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Contact Number"
+                value={formData.contact}
+                onChangeText={(text) => handleInputChange('contact', text)}
+                keyboardType="numeric"
+              />
+
+              <Text style={styles.label}>WhatsApp Contact</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="WhatsApp Contact"
+                value={formData.whatsapp}
+                onChangeText={(text) => handleInputChange('whatsapp', text)}
+                keyboardType="numeric"
+              />
+
+              <View style={styles.switchContainer}>
+                <Text style={styles.switchLabel}>Furnished</Text>
+                <Switch
+                  value={formData.furnished}
+                  onValueChange={(value) => handleSwitchChange('furnished', value)}
+                />
+              </View>
+
+              <View style={styles.switchContainer}>
+                <Text style={styles.switchLabel}>Parking for Car</Text>
+                <Switch
+                  value={formData.parkingCar}
+                  onValueChange={(value) => handleSwitchChange('parkingCar', value)}
+                />
+              </View>
+
+              <View style={styles.switchContainer}>
+                <Text style={styles.switchLabel}>Parking for Bike</Text>
+                <Switch
+                  value={formData.parkingBike}
+                  onValueChange={(value) => handleSwitchChange('parkingBike', value)}
+                />
+              </View>
+
+              <View style={styles.switchContainer}>
+                <Text style={styles.switchLabel}>Pets Allowed</Text>
+                <Switch
+                  value={formData.pets}
+                  onValueChange={(value) => handleSwitchChange('pets', value)}
+                />
+              </View>
+            </View>
+          </ProgressStep>
+
+          <ProgressStep
+            label="Step 2"
+            nextBtnText="Next"
+            previousBtnText="Back"
+            onNext={validateStep2}
+            errors={!!Object.keys(errors).length}
+          >
+            <View style={styles.stepContent}>
+              <Text style={styles.label}>Amenities *</Text>
+              <TextInput
+                style={[styles.input, errors.amenities && styles.errorInput]}
+                placeholder="Amenities"
+                value={formData.amenities}
+                onChangeText={(text) => handleInputChange('amenities', text)}
+              />
+              {errors.amenities && <Text style={styles.errorText}>{errors.amenities}</Text>}
+
+              <Text style={styles.label}>Included Utilities *</Text>
+              <TextInput
+                style={[styles.input, errors.included && styles.errorInput]}
+                placeholder="Included Utilities"
+                value={formData.included}
+                onChangeText={(text) => handleInputChange('included', text)}
+              />
+              {errors.included && <Text style={styles.errorText}>{errors.included}</Text>}
+
+              <Text style={styles.label}>Not Included Utilities *</Text>
+              <TextInput
+                style={[styles.input, errors.notIncluded && styles.errorInput]}
+                placeholder="Not Included Utilities"
+                value={formData.notIncluded}
+                onChangeText={(text) => handleInputChange('notIncluded', text)}
+              />
+              {errors.notIncluded && <Text style={styles.errorText}>{errors.notIncluded}</Text>}
+            </View>
+          </ProgressStep>
+
+          <ProgressStep
+            label="Step 3"
+            nextBtnText="Next"
+            previousBtnText="Back"
+            onNext={validateStep3}
+            errors={!!errors.images}
+          >
+            <View style={styles.stepContent}>
+              <Button title="Pick Images" onPress={onImagePick} />
+              <View style={styles.imagesContainer}>
+                {images.map((image, index) => (
+                  <View key={index} style={styles.imageWrapper}>
+                    <Image source={{ uri: image }} style={styles.image} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => removeImage(image)}
+                    >
+                      <Text style={styles.removeImageText}>X</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+              {errors.images && <Text style={styles.errorText}>{errors.images}</Text>}
+            </View>
+          </ProgressStep>
+
+          <ProgressStep
+            label="Review"
+            finishBtnText="Submit"
+            onSubmit={handleSubmit}
+          >
+            <View style={styles.stepContent}>
+              <Text style={styles.reviewText}>Property Name: {formData.name}</Text>
+              <Text style={styles.reviewText}>Detailed Description: {formData.detailed}</Text>
+              <Text style={styles.reviewText}>Locality: {formData.locality}</Text>
+              <Text style={styles.reviewText}>Share: {formData.share}</Text>
+              <Text style={styles.reviewText}>Map URL: {formData.map}</Text>
+              <Text style={styles.reviewText}>Available Date: {formData.available}</Text>
+              <Text style={styles.reviewText}>Contact: {formData.contact}</Text>
+              <Text style={styles.reviewText}>WhatsApp Contact: {formData.whatsapp}</Text>
+              <Text style={styles.reviewText}>Furnished: {formData.furnished ? 'Yes' : 'No'}</Text>
+              <Text style={styles.reviewText}>Parking for Car: {formData.parkingCar ? 'Yes' : 'No'}</Text>
+              <Text style={styles.reviewText}>Parking for Bike: {formData.parkingBike ? 'Yes' : 'No'}</Text>
+              <Text style={styles.reviewText}>Pets Allowed: {formData.pets ? 'Yes' : 'No'}</Text>
+              <Text style={styles.reviewText}>Amenities: {formData.amenities}</Text>
+              <Text style={styles.reviewText}>Included Utilities: {formData.included}</Text>
+              <Text style={styles.reviewText}>Not Included Utilities: {formData.notIncluded}</Text>
+              <Text style={styles.reviewText}>Images: {images.length > 0 ? 'Uploaded' : 'Not Uploaded'}</Text>
+            </View>
+          </ProgressStep>
+        </ProgressSteps>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepContent: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    borderRadius: 4,
+    marginBottom: 12,
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    borderRadius: 4,
+    height: 100,
+    marginBottom: 12,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  switchLabel: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  imagesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 4,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
+    padding: 4,
+  },
+  removeImageText: {
+    color: 'white',
+    fontSize: 12,
+  },
+  reviewText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  errorInput: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 12,
+  },
+});
